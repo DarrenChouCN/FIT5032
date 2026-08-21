@@ -1,7 +1,7 @@
 <template>
   <div class="container mt-5">
     <div class="row">
-      <div class="col-md-8 offset-md-2">
+      <div class="col-12 col-md-8 offset-md-2">
         <h1 class="text-center">User Information Form</h1>
 
         <form @submit.prevent="submitForm">
@@ -11,7 +11,7 @@
               <input id="username" v-model="formData.username" type="text" class="form-control" />
             </div>
 
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
               <label for="password" class="form-label">Password</label>
               <input
                 id="password"
