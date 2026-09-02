@@ -2,10 +2,12 @@
   <div class="container mt-5">
     <div class="row">
       <div class="col-12 col-md-8 offset-md-2">
-        <h1 class="text-center">User Information Form</h1>
+        <h1 class="text-center">💾 W5. Library Registration Form</h1>
+        <p class="text-center">Let's build some more advanced features into our form.</p>
 
         <form @submit.prevent="submitForm">
           <div class="row mb-3">
+            <!-- Username -->
             <div class="col-md-6">
               <label for="username" class="form-label">Username</label>
               <input
@@ -21,39 +23,7 @@
               </div>
             </div>
 
-            <div class="col-12 col-md-6">
-              <label for="password" class="form-label">Password</label>
-              <input
-                id="password"
-                v-model="formData.password"
-                type="password"
-                class="form-control"
-                @blur="validatePassword(true)"
-                @input="validatePassword(false)"
-              />
-              <div v-if="errors.password" class="text-danger">
-                {{ errors.password }}
-              </div>
-            </div>
-          </div>
-
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <div class="form-check">
-                <input
-                  id="isAustralian"
-                  v-model="formData.isAustralian"
-                  type="checkbox"
-                  class="form-check-input"
-                  @change="validateResident"
-                />
-                <label class="form-check-label" for="isAustralian"> Australian Resident? </label>
-                <div v-if="errors.resident" class="text-danger">
-                  {{ errors.resident }}
-                </div>
-              </div>
-            </div>
-
+            <!-- Gender -->
             <div class="col-md-6">
               <label for="gender" class="form-label">Gender</label>
               <select
@@ -73,6 +43,55 @@
             </div>
           </div>
 
+          <div class="row mb-3">
+            <!-- Password -->
+            <div class="col-md-6">
+              <label for="password" class="form-label">Password</label>
+              <input
+                id="password"
+                v-model="formData.password"
+                type="password"
+                class="form-control"
+                @blur="validatePassword(true)"
+                @input="validatePassword(false)"
+              />
+              <div v-if="errors.password" class="text-danger">
+                {{ errors.password }}
+              </div>
+            </div>
+
+            <!-- Confirm password -->
+            <div class="col-md-6">
+              <label for="confirm-password" class="form-label">Confirm password</label>
+              <input
+                id="confirm-password"
+                v-model="formData.confirmPassword"
+                type="password"
+                class="form-control"
+                @blur="validateConfirmPassword(true)"
+              />
+              <div v-if="errors.confirmPassword" class="text-danger">
+                {{ errors.confirmPassword }}
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="form-check">
+              <input
+                id="isAustralian"
+                v-model="formData.isAustralian"
+                type="checkbox"
+                class="form-check-input"
+                @change="validateResident"
+              />
+              <label class="form-check-label" for="isAustralian"> Australian Resident? </label>
+              <div v-if="errors.resident" class="text-danger">
+                {{ errors.resident }}
+              </div>
+            </div>
+          </div>
+
           <div class="mb-3">
             <label for="reason" class="form-label">Reason for joining</label>
             <textarea
@@ -85,6 +104,9 @@
             ></textarea>
             <div v-if="errors.reason" class="text-danger">
               {{ errors.reason }}
+            </div>
+            <div v-if="reasonSuccess" class="text-success">
+              {{ reasonSuccess }}
             </div>
           </div>
 
@@ -120,9 +142,12 @@ import { ref } from 'vue'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 
+const reasonSuccess = ref('')
+
 const formData = ref({
   username: '',
   password: '',
+  confirmPassword: '',
   isAustralian: false,
   reason: '',
   gender: '',
@@ -133,6 +158,7 @@ const submittedCards = ref([])
 const errors = ref({
   username: null,
   password: null,
+  confirmPassword: null,
   resident: null,
   gender: null,
   reason: null,
@@ -181,6 +207,16 @@ const validatePassword = (blur) => {
   }
 }
 
+const validateConfirmPassword = (blur) => {
+  if (formData.value.password !== formData.value.confirmPassword) {
+    if (blur) {
+      errors.value.confirmPassword = 'Passwords do not match.'
+    }
+  } else {
+    errors.value.confirmPassword = null
+  }
+}
+
 const validateResident = () => {
   errors.value.resident = formData.value.isAustralian
     ? null
@@ -192,7 +228,11 @@ const validateGender = () => {
 }
 
 const validateReason = (blur) => {
-  if (formData.value.reason.trim().length < 10) {
+  const reason = formData.value.reason.trim()
+
+  reasonSuccess.value = reason.toLowerCase().includes('friend') ? 'Great to have a friend' : ''
+
+  if (reason.length < 10) {
     if (blur) {
       errors.value.reason = 'Reason must be at least 10 characters.'
     }
@@ -205,15 +245,18 @@ const clearForm = () => {
   formData.value = {
     username: '',
     password: '',
+    confirmPassword: '',
     isAustralian: false,
     reason: '',
     gender: '',
   }
+  reasonSuccess.value = ''
 }
 
 const submitForm = () => {
   validateName(true)
   validatePassword(true)
+  validateConfirmPassword(true)
   validateResident()
   validateGender()
   validateReason(true)
