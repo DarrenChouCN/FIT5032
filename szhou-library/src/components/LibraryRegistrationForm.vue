@@ -110,6 +110,11 @@
             </div>
           </div>
 
+          <div class="mb-3">
+            <label for="suburb" class="form-label">Suburb</label>
+            <input id="suburb" type="text" class="form-control" v-bind:value="formData.suburb" />
+          </div>
+
           <div class="text-center">
             <button type="submit" class="btn btn-primary me-2">Submit</button>
             <button type="button" class="btn btn-secondary" @click="clearForm">Clear</button>
@@ -151,6 +156,7 @@ const formData = ref({
   isAustralian: false,
   reason: '',
   gender: '',
+  suburb: 'Clayton',
 })
 
 const submittedCards = ref([])
@@ -249,6 +255,7 @@ const clearForm = () => {
     isAustralian: false,
     reason: '',
     gender: '',
+    suburb: 'Clayton',
   }
   reasonSuccess.value = ''
 }
