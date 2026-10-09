@@ -18,3 +18,24 @@ exports.countBooks = onRequest(
     }
   }
 );
+
+exports.getAllBooks = onRequest(
+  { cors: true, maxInstances: 2 },
+  async (req, res) => {
+    try {
+      const snapshot = await admin.firestore()
+        .collection("books")
+        .get();
+
+      const books = snapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id
+      }));
+
+      res.status(200).json(books);
+    } catch (error) {
+      console.error("Error fetching books:", error);
+      res.status(500).json({ error: "Failed to fetch books" });
+    }
+  }
+);

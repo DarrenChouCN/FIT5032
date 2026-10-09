@@ -8,6 +8,7 @@ import AddBookView from '../views/AddBookView.vue'
 import GetBookCountView from '../views/GetBookCountView.vue'
 import CountBookAPI from '../views/CountBookAPI.vue'
 import WeatherView from '../views/WeatherView.vue'
+import GetAllBookAPI from '../views/GetAllBookAPI.vue'
 
 const routes = [
   { path: '/addbook', name: 'AddBook', component: AddBookView },
@@ -38,6 +39,11 @@ const routes = [
     path: '/WeatherCheck',
     name: 'WeatherCheck',
     component: WeatherView
+  },
+  {
+    path: '/GetAllBookAPI',
+    name: 'GetAllBookAPI',
+    component: GetAllBookAPI
   },
 ]
 
