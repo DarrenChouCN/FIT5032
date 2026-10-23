@@ -37,3 +37,9 @@ __screenshots__/
 
 # Vite
 *.timestamp-*-*.mjs
+
+# Environment configuration and Cloudflare local state
+.env
+.env.*
+!.env.example
+.wrangler/

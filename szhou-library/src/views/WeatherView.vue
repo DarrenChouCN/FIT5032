@@ -3,14 +3,20 @@
     <h1>WEATHER APP</h1>
 
     <form @submit.prevent="searchByCity">
-      <input v-model="city" type="text" placeholder="Enter city name, e.g. Clayton, AU" />
-      <button type="submit" :disabled="loading">Search</button>
+      <input
+        v-model="city"
+        aria-label="City name"
+        :disabled="loading"
+        type="text"
+        placeholder="Enter city name, e.g. Clayton, AU"
+      />
+      <button type="submit" :disabled="loading">Get Weather</button>
     </form>
 
     <button @click="fetchCurrentLocationWeather" :disabled="loading">Current Location</button>
 
-    <p v-if="loading">Loading weather...</p>
-    <p v-if="error">{{ error }}</p>
+    <p v-if="loading" role="status">Loading weather...</p>
+    <p v-if="error" role="alert">{{ error }}</p>
 
     <main v-if="weatherData">
       <p>{{ locationSource }}</p>
@@ -25,17 +31,15 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import axios from 'axios'
 
-const apiKey = 'a2caf1902fb78836773afbc683d2d9a8'
+const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY?.trim()
 const city = ref('')
 const weatherData = ref(null)
 const error = ref(null)
 const loading = ref(false)
 const locationSource = ref('')
-
-// https://api.openweathermap.org/data/2.5/weather?q=Clayton,AU&units=metric&appid=a2caf1902fb78836773afbc683d2d9a8
 
 const temperature = computed(() => {
   return weatherData.value ? weatherData.value.main.temp.toFixed(2) : null
@@ -47,6 +51,11 @@ const iconUrl = computed(() => {
 })
 
 const fetchWeatherData = async (params, source) => {
+  if (!apiKey) {
+    error.value = 'Weather API key is not configured. Set VITE_OPENWEATHER_API_KEY and rebuild.'
+    return
+  }
+
   loading.value = true
   error.value = null
   weatherData.value = null
@@ -58,6 +67,7 @@ const fetchWeatherData = async (params, source) => {
         appid: apiKey,
         units: 'metric',
       },
+      timeout: 15000,
     })
 
     weatherData.value = response.data
@@ -69,6 +79,8 @@ const fetchWeatherData = async (params, source) => {
       error.value = 'API key is invalid or not yet activated.'
     } else if (status === 404) {
       error.value = 'City not found. Try Clayton, AU.'
+    } else if (status === 429) {
+      error.value = 'Weather request limit reached. Please try again later.'
     } else {
       error.value = 'Unable to fetch weather. Please try again.'
     }
@@ -92,6 +104,11 @@ const fetchCurrentLocationWeather = () => {
   error.value = null
   weatherData.value = null
 
+  if (!apiKey) {
+    error.value = 'Weather API key is not configured. Set VITE_OPENWEATHER_API_KEY and rebuild.'
+    return
+  }
+
   if (!navigator.geolocation) {
     error.value = 'Geolocation is not supported by this browser.'
     return
@@ -105,17 +122,16 @@ const fetchCurrentLocationWeather = () => {
 
       await fetchWeatherData({ lat: latitude, lon: longitude }, 'Weather for your current location')
     },
-    () => {
+    (positionError) => {
       loading.value = false
-      error.value = 'Unable to get your location. Allow location access and try again.'
+      error.value =
+        positionError.code === 1
+          ? 'Location access denied. Enter a city name to get weather instead.'
+          : 'Unable to get your location. Enter a city name or try again.'
     },
     { timeout: 15000 },
   )
 }
-
-onMounted(() => {
-  fetchCurrentLocationWeather()
-})
 </script>
 
 <style scoped>

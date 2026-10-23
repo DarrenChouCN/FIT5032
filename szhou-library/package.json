@@ -11,7 +11,8 @@
     "lint:oxlint": "oxlint . --fix",
     "lint:eslint": "eslint . --fix --cache",
     "format": "prettier --write --experimental-cli src/",
-    "start": "node server.js"
+    "start": "node server.js",
+    "deploy": "npm run build && wrangler pages deploy dist --project-name szhou-library"
   },
   "dependencies": {
     "@primeuix/themes": "^3.0.0",
@@ -39,7 +40,8 @@
     "prettier": "3.9.5",
     "vite": "^8.1.5",
     "vite-plugin-vue-devtools": "^8.1.5",
-    "vue-eslint-parser": "^10.4.1"
+    "vue-eslint-parser": "^10.4.1",
+    "wrangler": "^4.152.0"
   },
   "engines": {
     "node": "^22.18.0 || >=24.12.0"
